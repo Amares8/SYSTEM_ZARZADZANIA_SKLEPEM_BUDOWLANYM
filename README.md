@@ -1,0 +1,2 @@
+# SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
+Projekt programu zarządzającego przedsiebiorstwem na PP
