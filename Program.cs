@@ -17,13 +17,6 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
     {
         
 
-
-        
-       
-        
-
-        
-
         public static string LoadConnectionConfig(string configFile)
         {
             //Ładujemy konfigurację połączenia z bazą danych, w parametrze ściezka do pliku
@@ -44,7 +37,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             }
             catch (Exception e)
             {
-                CreateLogMessage($"Błąd ładowania konfiguracji DB z pliku {configFile} ({e.Message})", true);
+                LoggedUser.CreateLogMessage($"Błąd ładowania konfiguracji DB z pliku {configFile} ({e.Message})", true);
                 return "";
             }    
         }
@@ -61,16 +54,10 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             MySqlConnection databaseConnection = new MySqlConnection(connectionString);
       
             LoggedUser userSession = new LoggedUser(databaseConnection);
-            if (userSession.Login("amares8", "shadow") == 0)
-            {
-                Console.WriteLine("Witaj " + userSession.GetLogin());
-            }
-            else
-            {
-                Console.WriteLine("Logowanie nieudane");
-            }
+
+            UserInterface.StartupScreen();
             
-            Console.Write(userSession.ChangePassword("shadow", "Qwerty1@3"));
+            
             
 
             

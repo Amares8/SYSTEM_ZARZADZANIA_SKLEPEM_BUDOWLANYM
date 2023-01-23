@@ -43,14 +43,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
         public int Login(string login, string password)
         {
-            /*
-            * - RETURN VALUES -
-            * 0 - success
-            * 1 - wrong input data
-            * 2 - wrong login/password
-            *
-            * 4 - sql/other error
-            */
+            
 
             if (login != "" && password != "")
             {
@@ -313,9 +306,13 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
         }
 
+    
 
 
-        internal static string GetStringSha256Hash(string text)
+
+
+
+    internal static string GetStringSha256Hash(string text)
         {
             //Function for generating SHA256 hashes
             if (String.IsNullOrEmpty(text))

@@ -1,0 +1,4 @@
+23.01.2023 18:46:16 - Błąd ładowania konfiguracji DB z pliku dbConfig.json (Could not find file 'D:\Projekty_IT\Visual Studio\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\bin\Debug\net7.0\dbConfig.json'.)
+23.01.2023 19:30:43 - Błąd ładowania konfiguracji DB z pliku dbConfig.json (Could not find file 'D:\Projekty_IT\Visual Studio\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\bin\Debug\net7.0\dbConfig.json'.)
+23.01.2023 19:31:03 - Błąd ładowania konfiguracji DB z pliku dbConfig.json (Could not find file 'D:\Projekty_IT\Visual Studio\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\bin\Debug\net7.0\dbConfig.json'.)
+23.01.2023 19:31:14 - Błąd ładowania konfiguracji DB z pliku dbConfig.json (Could not find file 'D:\Projekty_IT\Visual Studio\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\bin\Debug\net7.0\dbConfig.json'.)
