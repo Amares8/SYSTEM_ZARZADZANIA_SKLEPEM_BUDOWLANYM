@@ -55,7 +55,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
       
             LoggedUser userSession = new LoggedUser(databaseConnection);
 
-            UserInterface.StartupScreen();
+            UserInterface.StartupPanel(userSession);
             
             
             

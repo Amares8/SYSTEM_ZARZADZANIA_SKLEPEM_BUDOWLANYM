@@ -15,6 +15,8 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         private MySqlConnection databaseConnection;
         private string loggedLogin;
         private int accessLevel;
+        private string firstName;
+        private string lastName;
 
 
 
@@ -24,7 +26,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             databaseConnection = connection;
             loggedLogin = "";
             accessLevel = 0;
-        }
+            firstName = "";
+            lastName = "";
+    }
 
 
 
@@ -38,6 +42,17 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         {
             return this.accessLevel;
         }
+
+        public string GetFirstName()
+        {
+            return this.firstName;
+        }
+
+        public string GetLastName()
+        {
+            return this.lastName;
+        }
+
 
 
 
@@ -58,10 +73,24 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     if (result > 0)
                     {
                         //success
+                        //przypianie loginu
                         loggedLogin = loginSanitized;
+
+                        //przypianie uprawnien
                         sql = $"SELECT accessLevel FROM employees WHERE login = '{loginSanitized}';";
                         command = new MySqlCommand(sql, databaseConnection);
                         accessLevel = (int)command.ExecuteScalar();
+
+                        //imie
+                        sql = $"SELECT firstName FROM employees WHERE login = '{loginSanitized}';";
+                        command = new MySqlCommand(sql, databaseConnection);
+                        firstName = (string)command.ExecuteScalar();
+
+                        //nazwisko
+                        sql = $"SELECT lastName FROM employees WHERE login = '{loginSanitized}';";
+                        command = new MySqlCommand(sql, databaseConnection);
+                        lastName = (string)command.ExecuteScalar();
+
                         databaseConnection.Close();
                         return 0;
                     }
@@ -85,7 +114,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             else
             {
                 CreateLogMessage("Podano błędne (np puste) parametry przy próbie logowania", false);
-                return 1;
+                return 5;
             }
 
             //end login method
@@ -305,6 +334,8 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             }
 
         }
+
+        
 
     
 

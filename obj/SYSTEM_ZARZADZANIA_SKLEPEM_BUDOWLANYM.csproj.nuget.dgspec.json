@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projekty_IT\\Visual Studio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj": {}
+    "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj": {}
   },
   "projects": {
-    "D:\\Projekty_IT\\Visual Studio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj": {
+    "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projekty_IT\\Visual Studio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
+        "projectUniqueName": "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
         "projectName": "SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM",
-        "projectPath": "D:\\Projekty_IT\\Visual Studio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
+        "projectPath": "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
         "packagesPath": "C:\\Users\\Amares8\\.nuget\\packages\\",
-        "outputPath": "D:\\Projekty_IT\\Visual Studio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\obj\\",
+        "outputPath": "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

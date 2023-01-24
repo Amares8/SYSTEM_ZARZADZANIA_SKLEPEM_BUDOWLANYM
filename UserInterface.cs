@@ -12,18 +12,19 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
     {
 
         //Default startup screen
-        public static void StartupScreen (LoggedUser userSession)
+        public static void StartupPanel (LoggedUser userSession)
         {
             while (true)
             {
                 //default startup screen
+                Console.Clear();
                 Console.WriteLine("********************************************");
                 Console.WriteLine("Witam,                                     |");
                 Console.WriteLine("Proszę wybrać opcje login lub rejestracji: |");
                 Console.WriteLine("********************************************\n");
 
                 Console.WriteLine("     LOGIN:");
-                Console.WriteLine("Admin {1} \n");
+                Console.WriteLine("ZALOGUJ SIĘ {1} \n");
 
                 Console.WriteLine("      INNE:");
                 Console.WriteLine("PRZYPOMNIJ HASŁO {2}\n");
@@ -38,8 +39,6 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     Console.Clear();
                     Console.WriteLine("Numbers Please!");
                     Thread.Sleep(1000);
-                    Console.Clear();
-                    continue;
                 }
                 else
                 {
@@ -94,7 +93,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 {
                     Console.Clear();
 
-                    StartupScreen(userSession);
+                    StartupPanel(userSession);
                     
                 }
             }
@@ -109,8 +108,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             string? passInput;
             int loginResult;
 
-            while (true)
+            for (int tries = 0; tries < 3; tries++)
             {
+                Console.Clear();
                 Console.WriteLine("********************************");
                 Console.WriteLine("             LOGIN");
                 Console.WriteLine("********************************\n");
@@ -128,27 +128,96 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 {
                     case 0:
                         //udane logowanie
+                        UserPanel(userSession);
                         break;
                     case 2:
-                        //złe hasło
+                        Console.WriteLine("Podany login lub hasło są błędne! ");
+                        Thread.Sleep(1000);
                         break;
                     case 4:
                         //sql error
+                        Console.WriteLine("Wystąpił błąd z połaczeniem z bazą danych. ");
+                        Thread.Sleep(1000);
                         break;
                     case 5:
                         //pusty login lub hasło
+                        Console.WriteLine("Login ani hasło nie mogą być puste! . ");
+                        Thread.Sleep(1000);
                         break;
                     default:
-                        //niezintyfikowany bląd
+                        //inny blad
+                        Console.WriteLine("Wystąpił niezidentyfikowany błąd. ");
+                        Thread.Sleep(1000);
                         break;
                 }
                 
 
-
-
                 
             }
+            StartupPanel(userSession);
+            //end LoginPage
+        }
 
+
+        public static void UserPanel(LoggedUser userSession)
+        {
+
+            
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("********************************");
+                Console.WriteLine(" Witaj " + userSession.GetFirstName() + " " + userSession.GetLastName());
+                Console.WriteLine("********************************\n");
+
+
+
+                Console.WriteLine("     WYBIERZ FUNKCJĘ:");
+                Console.WriteLine("SPRZEDAŻ {1} \n");
+
+                Console.WriteLine("F2 {2}\n");
+                Console.WriteLine("      EXIT {3}");
+                Console.WriteLine("");
+
+                //input type check
+                bool isNumber = int.TryParse(Console.ReadLine(), out int userAnswer);
+
+                if (!isNumber)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Numbers Please!");
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    switch (userAnswer)
+                    {
+                        case 1:
+                            
+                            
+                            break;
+
+                        case 2:
+                         
+                            
+                            break;
+
+                        case 3:
+                            
+                            break;
+
+                        default:
+                            Console.Clear();
+                            Console.WriteLine("Wybierz poprawną liczbę");
+                            Thread.Sleep(800);
+                            break;
+                    }
+                }
+            }
+            
+
+
+            
         }
 
 
