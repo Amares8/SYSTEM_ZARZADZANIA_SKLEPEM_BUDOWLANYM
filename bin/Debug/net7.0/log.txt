@@ -7,3 +7,14 @@
 23.01.2023 22:42:18 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
 23.01.2023 22:42:29 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
 23.01.2023 22:46:11 - Błędny login lub hasło przy próbie logowania 
+24.01.2023 23:36:18 - Błędny login lub hasło przy próbie logowania 
+24.01.2023 23:58:58 - Błąd rejestracji użytkownika Unknown column 'id' in 'field list'
+24.01.2023 23:59:23 - Błąd rejestracji użytkownika The connection is already open.
+27.01.2023 12:46:22 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
+27.01.2023 12:49:44 - Błąd rejestracji użytkownika Unknown column 'id' in 'field list'
+27.01.2023 12:55:12 - Błąd rejestracji użytkownika Column 'employeeID' cannot be null
+27.01.2023 13:02:43 - Próba rejestracji użytkownika bez uprawnień, użytkownik: agnswi8
+27.01.2023 14:14:08 - Nie udało się użytkownikowi amares8 usunąć konta użytkownika agnswi8. 
+27.01.2023 14:15:36 - Nie udało się użytkownikowi amares8 usunąć konta użytkownika agnswi8. (Connection must be valid and open.)
+27.01.2023 14:17:03 - Użytkownik amares8 usunął konto użytkownika agnswi8. 
+27.01.2023 14:19:05 - Użytkownik amares8 usunął konto użytkownika leofer8. 

@@ -133,17 +133,24 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         */
 
 
-        public int RegisterUser(string newName, string newSurname, string newLogin, string newPassword, int newAccessLevel)
+        public int RegisterUser(string newLogin, string newName, string newSurname, string newJobTitle, string newPassword, int newAccessLevel)
         {
 
             if (loggedLogin != "")
             {
-                if (accessLevel >= 2 && accessLevel >= newAccessLevel && newAccessLevel >= 0)
+                if (!(newAccessLevel <= 3 && newAccessLevel >= 0))
                 {
+                    //wrong parameters
+                    return 5;
+                }
+                else if (accessLevel >= 2)
+                {
+                    
                     string newNameSanitized = SanitizeString(newName);
                     string newSurnameSanitized = SanitizeString(newSurname);
                     string newLoginSanitized = SanitizeString(newLogin);
                     string newPasswordHash = GetStringSha256Hash(newPassword);
+                    string newJobTitleSanitized = SanitizeString(newJobTitle);
 
                     try
                     {
@@ -162,7 +169,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                         else
                         {
                             databaseConnection.Open();
-                            sql = $"INSERT INTO `employees` (`id`, `name`, `surname`, `login`, `password`, `accessLevel`) VALUES (NULL, '{newNameSanitized}', '{newSurnameSanitized}', '{newLoginSanitized}', '{newPasswordHash}', '{newAccessLevel}')";
+                            sql = $"INSERT INTO `employees` (`employeeID`, `login`, `firstName`, `lastName`, `jobTitle`, `password`, `accessLevel`) VALUES ('', '{newLoginSanitized}', '{newNameSanitized}', '{newSurnameSanitized}', '{newJobTitleSanitized}', '{newPasswordHash}', '{newAccessLevel}')";
                             command = new MySqlCommand(sql, databaseConnection);
                             int registerResult = (int)(long)command.ExecuteNonQuery();
                             databaseConnection.Close();
@@ -192,7 +199,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 {
                     //no permissions
                     CreateLogMessage($"Próba rejestracji użytkownika bez uprawnień, użytkownik: {loggedLogin}", false);
-                    return 2;
+                    return 3;
                 }
             }
             else
@@ -203,6 +210,54 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
             //end registeruser method
+        }
+
+        public int DeleteUser(string loginToDelete)
+        {
+            if (loginToDelete == "")
+            {
+                //invalid parameter
+                CreateLogMessage("Podano błędny lub pusty parametr lub parametry przy próbie usunięcia konta użytkownika", false);
+                return 5;
+            }
+            else if (accessLevel < 3)
+            {
+                //no permissions
+                CreateLogMessage($"Użytkownik {loggedLogin} próbował usunąć bez uprawnień konto użytkownika {loginToDelete}", false);
+                return 3;
+            }
+            else
+            {
+                try
+                {
+                    string loginToDeleteSanitized = SanitizeString(loginToDelete);
+                    string sql = $"DELETE FROM employees WHERE `employees`.`login` = '{loginToDeleteSanitized}'";
+                    databaseConnection.Open();
+                    MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                    int userDeleteResult = (int)(long)command.ExecuteNonQuery();
+                    if (userDeleteResult == 1)
+                    {
+                        //wszytsko ok
+                        databaseConnection.Close();
+                        CreateLogMessage($"Użytkownik {loggedLogin} usunął konto użytkownika {loginToDeleteSanitized}. ", false);
+                        return 0;
+                    }
+                    else
+                    {
+                        //Błąd inny
+                        databaseConnection.Close();
+                        CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDeleteSanitized}. ", false);
+                        return 4;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //other/sql error
+                    CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDelete}. ({e.Message})", false);
+                    return 4;
+                }
+                
+            }
         }
 
         public int ChangePassword(string oldPassword, string newPassword)
@@ -395,7 +450,3 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         //end loggeduser class
     }
 }
-
-
-
-
