@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Asn1;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 {
     //Class that contains methods and functions used in providing user interface.
-    ///They should only be used for that purpose and for connecting to database they must 
+    ///They should only be used for this purpose
     class UserInterface
     {
 
@@ -19,17 +20,16 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 //default startup screen
                 Console.Clear();
                 Console.WriteLine("********************************************");
-                Console.WriteLine("Witam,                                     |");
-                Console.WriteLine("Proszę wybrać opcje login lub rejestracji: |");
+                Console.WriteLine("              Witamy w systemie     ");
+                Console.WriteLine("       zarządzania sklepem budowlanym       ");
+                Console.WriteLine("            Proszę wybrać opcję: ");
                 Console.WriteLine("********************************************\n");
 
-                Console.WriteLine("     LOGIN:");
-                Console.WriteLine("ZALOGUJ SIĘ {1} \n");
+                Console.WriteLine("\n   ZALOGUJ SIĘ {1} \n");
+                Console.WriteLine("   PRZYPOMNIJ HASŁO {2}\n");
+                Console.WriteLine("   EXIT {3}\n");
 
-                Console.WriteLine("      INNE:");
-                Console.WriteLine("PRZYPOMNIJ HASŁO {2}\n");
-                Console.WriteLine("      EXIT {3}");
-                Console.WriteLine("");
+                Console.Write("  >> ");
 
                 //input type check
                 bool isNumber = int.TryParse(Console.ReadLine(), out int userAnswer);
@@ -79,7 +79,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 Console.Clear();
                 Console.WriteLine("Czy jesteś pewien/na że chcesz wyjść z programu?\n");
                 Console.WriteLine("              TAK {T}       NIE {N}");
-                Console.WriteLine("");
+                Console.Write("\n  >> ");
 
                 char.TryParse(Console.ReadLine(), out char c);
                 char endPick = char.ToUpper(Convert.ToChar(c));
@@ -100,8 +100,6 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         //end exit cnofirmation
         }
 
-
-
         public static void LoginPage(LoggedUser userSession) //Login method 
         {
             string? userInput;
@@ -112,17 +110,18 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             {
                 Console.Clear();
                 Console.WriteLine("********************************");
-                Console.WriteLine("             LOGIN");
+                Console.WriteLine("           LOGOWANIE");
                 Console.WriteLine("********************************\n");
 
                 //collect user input
                 Console.Write("Login: ");
-                userInput = Console.ReadLine();
+                //userInput = Console.ReadLine();
 
                 Console.Write("Hasło: ");
-                passInput = Console.ReadLine();
+                //passInput = Console.ReadLine();
 
-                loginResult = userSession.Login(userInput, passInput);
+                //loginResult = userSession.Login(userInput, passInput);
+                loginResult = userSession.Login("amares8", "Qwerty1@3");
 
                 switch (loginResult)
                 {
@@ -158,11 +157,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             //end LoginPage
         }
 
-
         public static void UserPanel(LoggedUser userSession)
         {
-            
-            
+ 
             while (true)
             {
                 bool isNumber;
@@ -175,7 +172,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
                 Console.WriteLine("     WYBIERZ FUNKCJĘ:");
-                DeletingUserPanel(userSession);
+                AddingUserPanel(userSession);
             }
             
 
@@ -206,6 +203,20 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 Console.WriteLine("********************************\n");
 
 
+                string[] customColumnNames = { "Login", "Imię", "Nazwisko", "Stanowisko"};
+                int tableDisplayResult = userSession.DisplayTable("SELECT `login`, `firstName`, `lastName`, `jobTitle` FROM `employees`", customColumnNames);
+
+                switch (tableDisplayResult)
+                {
+                    case 0:
+                        break;
+                    default:
+                        Console.WriteLine("Nie udało się załadować poprawnie listy pracowników. ");
+                        break;
+                }
+
+                Console.WriteLine("\nDane nowego użytkownika: ");
+
                 Console.Write("Login: ");
                 newLogin = Console.ReadLine();
 
@@ -222,8 +233,15 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 newPassword = Console.ReadLine();
 
                 Console.Write("Poziom uprawnień (0-3): ");
-                newAccessLevel = int.Parse(Console.ReadLine());
+                bool isNumber;
+                do
+                {
+                    isNumber = int.TryParse(Console.ReadLine(), out newAccessLevel);
+                }
+                while (!isNumber);
+                
 
+                
                 Console.Write("Czy na pewno chcesz dodać użytkownika? (T/N): ");
 
                 char.TryParse(Console.ReadLine(), out char c);
@@ -270,7 +288,19 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             Console.WriteLine("      KASOWANIE UŻYTKOWNIKA");
             Console.WriteLine("********************************\n");
 
-            Console.Write("Podaj nazwę użytkownika którego chcesz usunąć: ");
+            string[] customColumnNames = { "Login", "Imię", "Nazwisko", "Stanowisko" };
+            int tableDisplayResult = userSession.DisplayTable("SELECT `login`, `firstName`, `lastName`, `jobTitle` FROM `employees`", customColumnNames);
+            
+            switch (tableDisplayResult)
+            {
+                case 0:
+                    break;
+                default:
+                    Console.WriteLine("Nie udało się załadować poprawnie listy pracowników. ");
+                    break;
+            }
+
+            Console.Write("\nPodaj nazwę użytkownika którego chcesz usunąć: ");
             string userToDelete = Console.ReadLine();
 
             Console.Write("\nCzy na pewno chcesz skasować użytkownika? Operacja jest nieodwracalna! (T/N): ");

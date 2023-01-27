@@ -18,3 +18,16 @@
 27.01.2023 14:15:36 - Nie udało się użytkownikowi amares8 usunąć konta użytkownika agnswi8. (Connection must be valid and open.)
 27.01.2023 14:17:03 - Użytkownik amares8 usunął konto użytkownika agnswi8. 
 27.01.2023 14:19:05 - Użytkownik amares8 usunął konto użytkownika leofer8. 
+27.01.2023 21:54:55 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
+27.01.2023 22:45:43 - Wystąpił błąd przy próbie pobierania danych (Connection must be valid and open.)
+27.01.2023 22:51:39 - Wystąpił błąd przy próbie pobierania danych (Connection must be valid and open.)
+27.01.2023 22:52:17 - Wystąpił błąd przy próbie pobierania danych (Connection must be valid and open.)
+27.01.2023 23:29:25 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
+27.01.2023 23:30:44 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
+27.01.2023 23:31:46 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
+28.01.2023 00:00:50 - Wystąpił błąd przy próbie pobierania danych (Unknown column 'lastdame' in 'field list')
+28.01.2023 00:01:44 - Wystąpił błąd przy próbie pobierania danych (Unable to connect to any of the specified MySQL hosts.)
+28.01.2023 00:02:36 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
+28.01.2023 00:02:39 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
+28.01.2023 00:03:02 - Błąd rejestracji użytkownika Unable to connect to any of the specified MySQL hosts.
+28.01.2023 00:03:07 - Wystąpił błąd przy próbie pobierania danych (Unable to connect to any of the specified MySQL hosts.)

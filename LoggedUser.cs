@@ -1,6 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -390,6 +392,116 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
         }
 
+
+        public int DisplayTable(string sql, string[] customColumnNames)
+        {
+            if (sql == "")
+            {
+                //bad parameters
+                CreateLogMessage("Podano puste polecenie przy próbie załadowania zawartości tablicy. ", false);
+                return 5;
+            }
+            try
+            {
+
+
+
+                // Get the data from the table
+                databaseConnection.Open();
+                MySqlCommand selectCommand = new MySqlCommand(sql, databaseConnection);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(selectCommand);
+                DataTable dataTable = new DataTable();
+                adapter.Fill(dataTable);
+                databaseConnection.Close();
+
+                // Create a 2-dimensional array to hold the data
+                int rows = dataTable.Rows.Count;
+                int cols = dataTable.Columns.Count;
+                string[,] dataArray = new string[rows, cols];
+
+                //Creating an array for max lengths of column element
+                int[] columnMaxLength = new int[cols];
+                int totalTableWidth = 0;
+                foreach (int lengthIndex in columnMaxLength)
+                {
+                    columnMaxLength[lengthIndex] = customColumnNames[lengthIndex].Length;
+                    //columnMaxLength[lengthIndex] = 0;
+                }
+
+                // Copy the data from the table to the array and calculating max kolumna element lengths
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        dataArray[i, j] = dataTable.Rows[i][j].ToString();
+                        if (columnMaxLength[j] < dataArray[i, j].Length)
+                        {
+                            columnMaxLength[j] = dataArray[i, j].Length;
+                        }
+                    }
+                }
+
+                //Calculating total table width
+                for (int i = 0; i < cols; i++)
+                {
+                    totalTableWidth += columnMaxLength[i] + 1;
+                }
+                totalTableWidth--;
+
+                
+
+                
+                //Displaying kolumn names row
+                for (int i = 0; i < cols; i++)
+                {
+                    Console.Write(customColumnNames[i]);
+                    for (int k = 0; k <= (columnMaxLength[i] - customColumnNames[i].Length); k++)
+                    {
+                        Console.Write(" ");
+                    }
+                }
+                Console.Write("\n");
+
+                //Displaying tags and content separator
+                string separator = "";
+                for (int i = 0; i < totalTableWidth; i++)
+                {
+                    separator += "═";
+                }
+                Console.WriteLine(separator);
+                
+                //Displaying the table
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        Console.Write(dataArray[i, j]);
+                        //Adding alignment spaces
+                        for (int k = 0; k <= (columnMaxLength[j] - dataArray[i, j].Length); k++)
+                        {
+                            Console.Write(" ");
+                        }
+                        
+                    }
+                    Console.Write("\n");
+                }
+
+
+
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage($"Wystąpił błąd przy próbie pobierania danych ({e.Message})", false);
+                return 4;
+            }
+            
+
+            
+        }
+
         
 
     
@@ -398,7 +510,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
 
-    internal static string GetStringSha256Hash(string text)
+        internal static string GetStringSha256Hash(string text)
         {
             //Function for generating SHA256 hashes
             if (String.IsNullOrEmpty(text))
