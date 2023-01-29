@@ -28,9 +28,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 Console.WriteLine("            Proszę wybrać opcję: ");
                 Console.WriteLine("********************************************\n");
 
-                Console.WriteLine("\n             ZALOGUJ SIĘ {1}\n");
-                Console.WriteLine("             O PROGRAMIE {2}\n");
-                Console.WriteLine("                 WYJŚCIE {3}\n");
+                Console.WriteLine("\n        ZALOGUJ SIĘ {1}\n");
+                Console.WriteLine("        O PROGRAMIE {2}\n");
+                Console.WriteLine("            WYJŚCIE {3}\n");
 
                 Console.Write("  >> ");
 
@@ -53,10 +53,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                             break;
 
                         case 2:
-                            Console.Clear();
-                            Console.WriteLine("No..."); //FOR NOW 
-                            Thread.Sleep(1000);
-                            Console.Clear();
+                            AboutPanel(userSession);
                             break;
 
                         case 3:
@@ -65,7 +62,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
                         default:
                             Console.Clear();
-                            Console.WriteLine("Invalid Input!");
+                            Console.WriteLine("Podaj liczbę. ");
                             Thread.Sleep(800);
                             break;
                     }
@@ -73,6 +70,39 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             }
 
         //end of startup screen
+        }
+
+        public static void AboutPanel(LoggedUser userSession)
+        {
+            Console.Clear();
+            Console.WriteLine("********************************");
+            Console.WriteLine("           O PROGRAMIE");
+            Console.WriteLine("********************************\n");
+
+            Console.WriteLine("System Zarządzania Sklepem Budownlnym");
+            Console.WriteLine("Program został stworzony na potrzeby zaliczenia projektu podstaw programowania.");
+            Console.WriteLine("Służy on do prezentacji modelu zarządzania sklepem budowlanym, w oparciu o ");
+            Console.WriteLine("bazę danych napisaną w języku SQL i program kliencki napisany w C#.");
+            Console.WriteLine("");
+            Console.WriteLine("W tym programie możemy edytować liczbę pracowników, sprawdzać");
+            Console.WriteLine("statystki i dane, stan magazynu, sprzedane przedmioty, listy klientów ");
+            Console.WriteLine("i pracowników. Program oparty jest o interfejs tekstowy w konsoli.");
+            Console.WriteLine("");
+            Console.WriteLine("Autorzy projektu: ");
+            Console.WriteLine(" - Patrycja Wierkin - projekt interfejsu użytkownika i poszczególnych paneli");
+            Console.WriteLine(" - Amadeusz Reszke - połączenie efektów pracy zespołu w jedno");
+            Console.WriteLine(" - Muhammad Zin Al-Din - stworzenie bazy danych i przygotowanie kwerend do komunikacji");
+            Console.WriteLine(" - Tomasz Wysocki - testowanie i eliminacja błędów, stworzenie tego tekstu :)");
+
+            Console.WriteLine("\nAby wyjść, naciśnij ESC... ");
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+            }
+            while (key != ConsoleKey.Escape);
+            StartupPanel(userSession);
+
         }
 
         public static void ExitConfirmation(LoggedUser userSession)
@@ -182,18 +212,18 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     //ACCESS LEVEL 1
                     Console.WriteLine("      (0) Wyloguj");
                     Console.WriteLine("");
-                    Console.WriteLine(" • OPERACJE •");
+                    Console.WriteLine(" * OPERACJE *");
                     Console.WriteLine("      (1) Nowa transakcja");
                     Console.WriteLine("      (2) Zmiana stanów magazynowych");
                     Console.WriteLine("");
-                    Console.WriteLine(" • STATYSTYKI •");
+                    Console.WriteLine(" * STATYSTYKI *");
                     Console.WriteLine("      (3) Wykonane transkacje");
                     Console.WriteLine("");
-                    Console.WriteLine(" • PRZEGLĄDANIE •");
+                    Console.WriteLine(" * PRZEGLĄDANIE *");
                     Console.WriteLine("      (4) Produkty");
                     Console.WriteLine("      (5) Klienci");
                     Console.WriteLine("");
-                    Console.WriteLine(" • BEZPIECZEŃSTWO •");
+                    Console.WriteLine(" * BEZPIECZEŃSTWO *");
                     Console.WriteLine("      (6) Zmiana hasła");
 
                     bool isValidNumber;
@@ -237,21 +267,21 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     //ACCESS LEVEL 2
                     Console.WriteLine("      (0) Wyloguj");
                     Console.WriteLine("");
-                    Console.WriteLine(" • OPERACJE •");
+                    Console.WriteLine(" * OPERACJE *");
                     Console.WriteLine("      (1) Nowa transakcja");
                     Console.WriteLine("      (2) Zmiana stanów magazynowych");
                     Console.WriteLine("      (3) Dodawanie nowego produktu");
                     Console.WriteLine("");
-                    Console.WriteLine(" • STATYSTYKI •");
+                    Console.WriteLine(" * STATYSTYKI *");
                     Console.WriteLine("      (4) Wykonane transkacje");
                     Console.WriteLine("      (5) Statystyki pracowników");
                     Console.WriteLine("");
-                    Console.WriteLine(" • PRZEGLĄDANIE •");
+                    Console.WriteLine(" * PRZEGLĄDANIE *");
                     Console.WriteLine("      (6) Produkty");
                     Console.WriteLine("      (7) Klienci");
                     Console.WriteLine("      (8) Pracownicy");
                     Console.WriteLine("");
-                    Console.WriteLine(" • BEZPIECZEŃSTWO •");
+                    Console.WriteLine(" * BEZPIECZEŃSTWO *");
                     Console.WriteLine("      (9) Zmiana hasła");
 
                     bool isValidNumber;
@@ -305,24 +335,24 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     //ACCESS LEVEL 3
                     Console.WriteLine("      (0) Wyloguj");
                     Console.WriteLine("");
-                    Console.WriteLine(" • OPERACJE •");
+                    Console.WriteLine(" * OPERACJE *");
                     Console.WriteLine("      (1) Nowa transakcja");
                     Console.WriteLine("      (2) Zmiana stanów magazynowych");
                     Console.WriteLine("      (3) Dodawanie nowego produktu");
                     Console.WriteLine("");
-                    Console.WriteLine(" • STATYSTYKI •");
+                    Console.WriteLine(" * STATYSTYKI *");
                     Console.WriteLine("      (4) Wykonane transkacje");
                     Console.WriteLine("      (5) Statystyki pracowników");
                     Console.WriteLine("");
-                    Console.WriteLine(" • PRZEGLĄDANIE •");
+                    Console.WriteLine(" * PRZEGLĄDANIE *");
                     Console.WriteLine("      (6) Produkty");
                     Console.WriteLine("      (7) Klienci");
                     Console.WriteLine("      (8) Pracownicy");
                     Console.WriteLine("");
-                    Console.WriteLine(" • BEZPIECZEŃSTWO •");
+                    Console.WriteLine(" * BEZPIECZEŃSTWO *");
                     Console.WriteLine("      (9) Zmiana hasła");
                     Console.WriteLine("");
-                    Console.WriteLine(" • ZARZĄDZANIE BAZĄ •");
+                    Console.WriteLine(" * ZARZĄDZANIE BAZĄ *");
                     Console.WriteLine("     (10) Dodawanie nowego pracownika");
                     Console.WriteLine("     (11) Usuwanie pracownika");
                     Console.WriteLine("     (12) Resetowanie hasła użytkownika\n");

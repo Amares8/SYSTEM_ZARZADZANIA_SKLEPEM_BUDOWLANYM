@@ -60,7 +60,8 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         static void Main(string[] args)
         {
             Console.Title = "System Zarządzania Sklepem Budowlanym";
-            
+
+
             string connectionString = LoadConnectionConfig("dbConfig.json");
             if (connectionString == "")
             {
