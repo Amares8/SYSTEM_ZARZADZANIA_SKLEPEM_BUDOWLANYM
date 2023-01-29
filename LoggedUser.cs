@@ -420,44 +420,6 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             return totalPrice * (-1);
         }
 
-        public string ExecuteScalarCommand(string sql)
-        {
-            string result;
-            try
-            {
-                databaseConnection.Open();
-                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
-                result = command.ExecuteScalar().ToString();
-                databaseConnection.Close();
-                return result;
-            }
-            catch (Exception e)
-            {
-                //error
-                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
-                return "";
-            }
-        }
-
-        public string ExecuteNonQueryCommand(string sql)
-        {
-            string result;
-            try
-            {
-                databaseConnection.Open();
-                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
-                result = command.ExecuteNonQuery().ToString();
-                databaseConnection.Close();
-                return result;
-            }
-            catch (Exception e)
-            {
-                //error
-                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
-                return "";
-            }
-        }
-
         public int DeleteUser(string loginToDelete)
         {
             if (loginToDelete == "")
@@ -637,6 +599,46 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         }
 
 
+
+
+
+        public string ExecuteScalarCommand(string sql)
+        {
+            string result;
+            try
+            {
+                databaseConnection.Open();
+                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                result = command.ExecuteScalar().ToString();
+                databaseConnection.Close();
+                return result;
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
+                return "";
+            }
+        }
+
+        public string ExecuteNonQueryCommand(string sql)
+        {
+            string result;
+            try
+            {
+                databaseConnection.Open();
+                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                result = command.ExecuteNonQuery().ToString();
+                databaseConnection.Close();
+                return result;
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
+                return "";
+            }
+        }
         public int DisplayTable(string sql, string[] customColumnNames)
         {
             if (sql == "")
@@ -666,10 +668,21 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 //Creating an array for max lengths of column element
                 int[] columnMaxLength = new int[cols];
                 int totalTableWidth = 0;
-                for (int lengthIndex = 0; lengthIndex < customColumnNames.Length; lengthIndex++)
-                { 
-                    columnMaxLength[lengthIndex] = customColumnNames[lengthIndex].Length;
+                if (customColumnNames != null)
+                {
+                    for (int lengthIndex = 0; lengthIndex < customColumnNames.Length; lengthIndex++)
+                    {
+                        columnMaxLength[lengthIndex] = customColumnNames[lengthIndex].Length;
+                    }
                 }
+                else
+                {
+                    for(int lengthIndex = 0; lengthIndex < cols; lengthIndex++)
+                    {
+                        columnMaxLength[lengthIndex] = customColumnNames[lengthIndex].Length;
+                    }
+                }
+                
 
                 // Copy the data from the table to the array and calculating max kolumna element lengths
                 for (int i = 0; i < rows; i++)
@@ -686,7 +699,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
                 //displaying tags and separator on the top of the tabele
-                if (true)
+                if (customColumnNames != null && dataArray[0, 0] != "")
                 {
                     //Calculating total table width
                     for (int i = 0; i < cols; i++)
@@ -746,11 +759,70 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             
         }
 
-        
 
-    
+        public int[] GetTransactionIDS()
+        {
+            HashSet<int> values = new HashSet<int>(); // use a hashset to store unique values
 
+            try
+            {
+                databaseConnection.Open();
 
+                string query = "SELECT DISTINCT transactionID FROM purchases;";
+
+                using (MySqlCommand command = new MySqlCommand(query, databaseConnection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            values.Add(int.Parse(reader["transactionID"].ToString()));
+                        }
+                    }
+                }
+                databaseConnection.Close();
+                return new List<int>(values).ToArray();
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage("Bład przy ładowaniu id transkacji " + e.Message, false);
+                return null;
+            }
+            
+        }
+
+        public int[] GetUserIDS()
+        {
+            HashSet<int> values = new HashSet<int>(); // use a hashset to store unique values
+
+            try
+            {
+                databaseConnection.Open();
+
+                string query = "SELECT DISTINCT employeeID FROM employees;";
+
+                using (MySqlCommand command = new MySqlCommand(query, databaseConnection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            values.Add(int.Parse(reader["employeeID"].ToString()));
+                        }
+                    }
+                }
+                databaseConnection.Close();
+                return new List<int>(values).ToArray();
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage("Bład przy ładowaniu id userów " + e.Message, false);
+                return null;
+            }
+
+        }
 
 
 
@@ -769,7 +841,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             }
         }
 
-        public static string SanitizeString(string input)
+        public string SanitizeString(string input)
         {
             //Function for sanitizing strings, especially recieved directly from user. 
             Regex ruleRegex = new Regex(@"[^\w\.\s@-]");

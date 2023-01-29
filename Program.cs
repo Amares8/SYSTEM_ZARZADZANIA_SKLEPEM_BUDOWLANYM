@@ -16,6 +16,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
     class Program
     {
         
+        
 
         public static string LoadConnectionConfig(string configFile)
         {
@@ -58,12 +59,8 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
         static void Main(string[] args)
         {
-            int x = 1;
-            long y = 2;
-            y = x;
+            Console.Title = "System Zarządzania Sklepem Budowlanym";
             
-            
-            Thread.Sleep(2000);
             string connectionString = LoadConnectionConfig("dbConfig.json");
             if (connectionString == "")
             {

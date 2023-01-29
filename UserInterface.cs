@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 {
@@ -173,7 +174,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
                 Console.WriteLine("     WYBIERZ FUNKCJĘ:");
-                TransactionPanel(userSession);
+                //BrowseTransactionsPanel(userSession);
+                //TransactionPanel(userSession);
+                BrowseUserStatisticsPanel(userSession);
             }
             
 
@@ -375,6 +378,98 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             
         }
 
+        public static void BrowseTransactionsPanel(LoggedUser userSession)
+        {
+            Console.Clear();
+            Console.WriteLine("********************************");
+            Console.WriteLine("           TRANSAKCJE");
+            Console.WriteLine("********************************\n");
+
+            userSession.DisplayTable("SELECT login, firstName, lastName, jobTitle FROM employees", new string[] { "Login", "Imię", "Nazwisko", "Stanowisko"});
+
+            Console.WriteLine("\nPodaj login użytkownika (dla wszystkich użytkowników pozostaw pusty): ");
+            string chosenUserLogin;
+
+            chosenUserLogin = userSession.SanitizeString(Console.ReadLine());
+               
+
+            Console.Clear();
+            Console.WriteLine("********************************");
+            Console.WriteLine("           TRANSAKCJE");
+            Console.WriteLine("********************************\n");
+
+
+            string displayHeaderSQL;
+            string displayContentSQL;
+
+
+            //Wyswiatlenie tabeli
+            int[] transationIDS = userSession.GetTransactionIDS();
+
+            foreach (int transactionID in transationIDS)
+            {
+                if (chosenUserLogin == "")
+                {
+                    displayHeaderSQL = $"SELECT purchases.transactionID, DATE_FORMAT(purchases.date,'%d-%m-%y'), CONCAT(customers.firstName, ' ', customers.lastName), employees.login, ROUND(SUM(purchases.amount*products.sellingPrice)/100, 2) FROM customers, purchases, products, employees WHERE customers.customerID = purchases.customerID AND purchases.productID = products.productID AND purchases.employeeID = employees.employeeID AND purchases.transactionID = {transactionID} LIMIT 1;";
+                    displayContentSQL = $"SELECT products.productName, products.productVendor, purchases.amount, ROUND(purchases.amount*products.sellingPrice/100, 2) FROM products, purchases, employees WHERE purchases.productID = products.productID AND employees.employeeID = purchases.employeeID AND purchases.transactionID = {transactionID};";
+                }
+                else
+                {
+                    displayHeaderSQL = $"SELECT purchases.transactionID, DATE_FORMAT(purchases.date,'%d-%m-%y'), CONCAT(customers.firstName, ' ', customers.lastName), employees.login, ROUND(SUM(purchases.amount*products.sellingPrice)/100, 2) FROM customers, purchases, products, employees WHERE employees.login='{chosenUserLogin}' AND customers.customerID=purchases.customerID AND purchases.productID=products.productID AND purchases.employeeID=employees.employeeID AND purchases.transactionID = {transactionID} LIMIT 1;";
+                    displayContentSQL = $"SELECT products.productName, products.productVendor, purchases.amount, ROUND(purchases.amount*products.sellingPrice/100, 2) FROM products, purchases, employees WHERE purchases.productID = products.productID AND employees.employeeID = purchases.employeeID  AND employees.login = '{chosenUserLogin}' AND purchases.transactionID = {transactionID};";
+                }
+
+                userSession.DisplayTable(displayHeaderSQL, new string[] {"ID", "Data", "Klient", "Pracownik", "Łącznie"});
+                Console.Write("\n");
+                userSession.DisplayTable(displayContentSQL, new string[] {"Nazwa", "Producent", "Ilość", "Kwota" });
+
+                Console.Write("\n\n\n\n");
+            }
+            
+
+
+
+
+            Console.WriteLine("\nAby wyjść, naciśnij ESC... ");
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+            }
+            while (key != ConsoleKey.Escape);
+            UserPanel(userSession);
+
+        }
+
+        public static void BrowseUserStatisticsPanel(LoggedUser userSession)
+        {
+            Console.Clear();
+            Console.WriteLine("********************************");
+            Console.WriteLine("     STATYSTYKI PRACOWNIKÓW");
+            Console.WriteLine("********************************\n");
+
+            int[] usersID = userSession.GetUserIDS();
+
+            foreach (int userID in usersID)
+            {
+                if (int.Parse(userSession.ExecuteScalarCommand($"SELECT COUNT(DISTINCT purchases.transactionID) FROM purchases WHERE purchases.employeeID = {userID};")) > 0)
+                { 
+                    userSession.DisplayTable($"SELECT CONCAT(employees.firstName, ' ', employees.lastName), COUNT(DISTINCT purchases.transactionID), ROUND(SUM(purchases.amount*products.sellingPrice)/100, 2) FROM employees, purchases, products WHERE purchases.employeeID = {userID} AND products.productID = purchases.productID AND employees.employeeID = purchases.employeeID", new string[] { "Pracownik", "Transakcje", "Sprzedaż" });
+                    Console.Write("\n\n");
+                }
+            }
+            
+
+            Console.WriteLine("\nAby wyjść, naciśnij ESC... ");
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+            }
+            while (key != ConsoleKey.Escape);
+            UserPanel(userSession);
+
+        }
 
         public static void AddingUserPanel(LoggedUser userSession)
         {
