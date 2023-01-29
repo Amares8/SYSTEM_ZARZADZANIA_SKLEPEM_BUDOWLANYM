@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,6 +17,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         //A class representing ongoing logged user session
         //loggedLogin being equal to "" means user is not logged in
         private MySqlConnection databaseConnection;
+        private int loggedID;
         private string loggedLogin;
         private int accessLevel;
         private string firstName;
@@ -55,6 +58,11 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             return this.lastName;
         }
 
+        public int GetID()
+        {
+            return this.loggedID;
+        }
+
 
 
 
@@ -92,6 +100,11 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                         sql = $"SELECT lastName FROM employees WHERE login = '{loginSanitized}';";
                         command = new MySqlCommand(sql, databaseConnection);
                         lastName = (string)command.ExecuteScalar();
+                        
+                        //id
+                        sql = $"SELECT employeeID FROM employees WHERE login = '{loginSanitized}';";
+                        command = new MySqlCommand(sql, databaseConnection);
+                        loggedID = (int)command.ExecuteScalar();
 
                         databaseConnection.Close();
                         return 0;
@@ -126,12 +139,15 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
         /*
             * - FUNCTION RETURN VALUES -
+            *<0 - returned total price in 
             * 0 - successfull
             * 1 - not logged in
             * 2 - wrong login/password
             * 3 - no permissions
             * 4 - sql/other error
             * 5 - invalid/empty parameters
+            * 6 - insufficient stock
+            * 7 - product does not exist
         */
 
 
@@ -212,6 +228,234 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
 
 
             //end registeruser method
+        }
+
+
+
+        public int RegisterClient(string newName, string newSurname, string newPhoneNumber, string newCity, string newEmail)
+        {
+            if (newName == "" || newSurname == "" || newPhoneNumber == "" || newCity == "" || newEmail == "")
+            {
+                //Empty parameter
+                CreateLogMessage("Podano puste parametry przy próbie rejestracji klienta. ", false);
+                return 5;
+            }
+            else
+            {
+                string newNameSanitized = SanitizeString(newName);
+                string newSurnameSanitized = SanitizeString(newSurname);
+                string newPhoneNumberSanitized = SanitizeString(newPhoneNumber);
+                string newCitySanitized = SanitizeString(newCity);
+                string newEmailSanitized = SanitizeString(newEmail);
+
+
+                try
+                {
+
+                    string sql = $"INSERT INTO `customers` (`customerID`, `firstName`, `lastName`, `phoneNr`, `city`, `email`) VALUES ('', '{newNameSanitized}', '{newSurnameSanitized}', '{newPhoneNumberSanitized}', '{newCitySanitized}', '{newEmailSanitized}')";
+                    databaseConnection.Open();
+                    MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                    int registerResult = (int)(long)command.ExecuteNonQuery();
+                    databaseConnection.Close();
+                    if (registerResult == 1)
+                    {
+                        //success
+                        return 0;
+                    }
+                    else
+                    {
+                        //sql/other error
+                        CreateLogMessage("Błąd rejestracji klienta ", false);
+                        return 4;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //sql/other error
+                    CreateLogMessage($"Błąd rejestracji klienta ({e.Message})", false);
+                    return 4;
+                }
+            }
+            //end registeruser method
+        }
+
+        public int CreateTransaction(int[] productID, int[] productAmounts, int customerID)
+        {
+            //Validation
+            if (productID.Length != productAmounts.Length)
+            {
+                //Bad parameters
+                CreateLogMessage("Długości tablic w parametrach są różne! ", false);
+                return 5;
+            }
+            var set = new HashSet<int>();
+            foreach (var num in productID)
+            {
+                if (!set.Add(num))
+                {
+                    //repeats in prduct id table
+                    CreateLogMessage("W tablicy z numerami produktów znajdują powtórzenia. ", false);
+                    return 5;
+                }
+            }
+            //Validating customer id
+            string customerIDCheckSQL = $"SELECT COUNT(*) FROM `customers` WHERE `customerID` = {customerID};";
+            MySqlCommand idCheckCommand = new MySqlCommand(customerIDCheckSQL, databaseConnection);
+            int customerIDCheckResult;
+            try
+            {
+                databaseConnection.Open();
+                customerIDCheckResult = int.Parse(idCheckCommand.ExecuteScalar().ToString());
+                databaseConnection.Close();
+            }
+            catch (Exception e)
+            {
+                //error 4
+                CreateLogMessage("Wystąpił problem przy walidacji id klienta podczas dodawania nowej transkacji. ({e.Message})", false);
+                return 4;
+            }
+            if (customerIDCheckResult != 1)
+            {
+                //erro jakis
+                CreateLogMessage("Nie ma takiego klietna przy próbie dodania transakcji. ", false);
+                return 5;
+            }
+
+
+
+            //Generating transaction ID
+            string transactionIDSQL = "SELECT MAX(`transactionID`) FROM `purchases`";
+            int newTransactionID;
+            try
+            {
+                databaseConnection.Open();
+                MySqlCommand command = new MySqlCommand(transactionIDSQL, databaseConnection);
+                newTransactionID = int.Parse(command.ExecuteScalar().ToString());
+                newTransactionID++;
+                databaseConnection.Close();
+            }
+            catch (Exception e)
+            {
+                //sql/other error
+                CreateLogMessage($"Inny/sql błąd przy generowaniu nowego id zamówienia. ({e.Message})", false);
+                return 4;
+            }
+
+            int productStockLevel= 0;
+            int productExist;
+            int transactionInsertResult;
+            int stockSubstractingResult;
+            string productStockSQL;
+            string productExistSQL;
+            string stockSubstractingSQL;
+            string priceGettingSQL;
+
+
+            int totalPrice = 0;
+
+            // --- Main loop throudhthgg every ordered item --- //
+            for (int i = 0; i < productID.Length; i++)
+            {
+
+                //Sprawdzenie czy produkt istnieje
+                productExistSQL = $"SELECT COUNT(*) FROM `products` WHERE `productID` = {productID[i]}";
+                productExist = int.Parse(ExecuteScalarCommand(productExistSQL));
+                if (productExist != 1)
+                {
+                    //produkt nie istnieje
+                    CreateLogMessage($"Próba zakupu nieistniejącego produktu o id {productID[i]}", false);
+                    return 7;
+                }
+
+
+                //Sprawdzenie stanów magazynowych
+                productStockSQL = $"SELECT `quantityInStock` FROM `products` WHERE `productID` = {productID[i]}";
+                productStockLevel = int.Parse(ExecuteScalarCommand(productStockSQL));
+
+                if (productStockLevel < productAmounts[i])
+                {
+                    //Niewystarczające stany magazynowe
+                    CreateLogMessage($"Niewystarczajace stany magazynowe na sprzedaż produktu: {productID[i]} w ilości: {productAmounts[i]}. ", false);
+                    return 6;
+                }
+               
+                string insertPurchaseSQL = $"INSERT INTO `purchases` (`id`, `customerID`, `employeeID`, `productID`, `amount`, `transactionID`) VALUES ('', '{customerID}', '{loggedID}', '{productID[i]}', '{productAmounts[i]}', '{newTransactionID}');";
+                try
+                {
+                    databaseConnection.Open();
+                    MySqlCommand command = new MySqlCommand(insertPurchaseSQL, databaseConnection);
+                    transactionInsertResult = command.ExecuteNonQuery();
+                    databaseConnection.Close();
+                    if (transactionInsertResult != 1)
+                    {
+                        //error
+                        CreateLogMessage("Błąd przy dodawaniu nowej transakcji", false);
+                        return 4;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //error 4
+                    CreateLogMessage($"Błąd przy dodawaniu nowej transakcji. ({e.Message})", false);
+                    return 4;
+                }
+
+
+                //Odjęcie ze stanu magazynowego
+                stockSubstractingSQL = $"UPDATE `products` SET `quantityInStock` = '{productStockLevel - productAmounts[i]}' WHERE `productID` = {productID[i]};";
+                stockSubstractingResult = int.Parse(ExecuteNonQueryCommand(stockSubstractingSQL));
+                if (stockSubstractingResult != 1)
+                {
+                    CreateLogMessage($"Błąd przy odejmowaniu stanów magazynowych", false);
+                    return 4;
+                }
+
+                //Dodanie do ceny
+                priceGettingSQL = $"SELECT sellingPrice FROM `products` WHERE `productID` = {productID[i]};";
+                totalPrice += int.Parse(ExecuteScalarCommand(priceGettingSQL)) * productAmounts[i];
+
+            }
+
+            //sukces
+            return totalPrice * (-1);
+        }
+
+        public string ExecuteScalarCommand(string sql)
+        {
+            string result;
+            try
+            {
+                databaseConnection.Open();
+                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                result = command.ExecuteScalar().ToString();
+                databaseConnection.Close();
+                return result;
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
+                return "";
+            }
+        }
+
+        public string ExecuteNonQueryCommand(string sql)
+        {
+            string result;
+            try
+            {
+                databaseConnection.Open();
+                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                result = command.ExecuteNonQuery().ToString();
+                databaseConnection.Close();
+                return result;
+            }
+            catch (Exception e)
+            {
+                //error
+                CreateLogMessage($"Błąd przy wykonywaniu komendy '{sql}', ({e.Message})", false);
+                return "";
+            }
         }
 
         public int DeleteUser(string loginToDelete)
@@ -422,10 +666,9 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 //Creating an array for max lengths of column element
                 int[] columnMaxLength = new int[cols];
                 int totalTableWidth = 0;
-                foreach (int lengthIndex in columnMaxLength)
-                {
+                for (int lengthIndex = 0; lengthIndex < customColumnNames.Length; lengthIndex++)
+                { 
                     columnMaxLength[lengthIndex] = customColumnNames[lengthIndex].Length;
-                    //columnMaxLength[lengthIndex] = 0;
                 }
 
                 // Copy the data from the table to the array and calculating max kolumna element lengths
@@ -441,34 +684,38 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     }
                 }
 
-                //Calculating total table width
-                for (int i = 0; i < cols; i++)
-                {
-                    totalTableWidth += columnMaxLength[i] + 1;
-                }
-                totalTableWidth--;
 
-                
-
-                
-                //Displaying kolumn names row
-                for (int i = 0; i < cols; i++)
+                //displaying tags and separator on the top of the tabele
+                if (true)
                 {
-                    Console.Write(customColumnNames[i]);
-                    for (int k = 0; k <= (columnMaxLength[i] - customColumnNames[i].Length); k++)
+                    //Calculating total table width
+                    for (int i = 0; i < cols; i++)
                     {
-                        Console.Write(" ");
+                        totalTableWidth += columnMaxLength[i] + 1;
                     }
-                }
-                Console.Write("\n");
+                    totalTableWidth--;
 
-                //Displaying tags and content separator
-                string separator = "";
-                for (int i = 0; i < totalTableWidth; i++)
-                {
-                    separator += "═";
+                    //Displaying kolumn names row
+                    for (int i = 0; i < cols; i++)
+                    {
+                        Console.Write(customColumnNames[i]);
+                        for (int k = 0; k <= (columnMaxLength[i] - customColumnNames[i].Length); k++)
+                        {
+                            Console.Write(" ");
+                        }
+                    }
+                    Console.Write("\n");
+
+                    //Displaying tags and content separator
+                    string separator = "";
+                    for (int i = 0; i < totalTableWidth; i++)
+                    {
+                        separator += "═";
+                    }
+                    Console.WriteLine(separator);
                 }
-                Console.WriteLine(separator);
+
+                
                 
                 //Displaying the table
                 for (int i = 0; i < rows; i++)
@@ -485,9 +732,6 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     }
                     Console.Write("\n");
                 }
-
-
-
 
                 return 0;
             }
@@ -528,7 +772,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
         public static string SanitizeString(string input)
         {
             //Function for sanitizing strings, especially recieved directly from user. 
-            Regex ruleRegex = new Regex(@"[^\w\.@-]");
+            Regex ruleRegex = new Regex(@"[^\w\.\s@-]");
             return Regex.Replace(input, $"{ruleRegex}", "");
         }
 

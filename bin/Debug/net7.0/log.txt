@@ -31,3 +31,25 @@
 28.01.2023 00:02:39 - Błąd połączenia przy próbie zalogowania (Unable to connect to any of the specified MySQL hosts.)
 28.01.2023 00:03:02 - Błąd rejestracji użytkownika Unable to connect to any of the specified MySQL hosts.
 28.01.2023 00:03:07 - Wystąpił błąd przy próbie pobierania danych (Unable to connect to any of the specified MySQL hosts.)
+28.01.2023 23:28:45 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Unknown column 'quanityInStock' in 'field list')
+28.01.2023 23:28:45 - Wystąpił błąd przy próbie pobierania danych (The connection is already open.)
+28.01.2023 23:31:36 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Object reference not set to an instance of an object.)
+28.01.2023 23:31:36 - Wystąpił błąd przy próbie pobierania danych (The connection is already open.)
+28.01.2023 23:31:38 - Wystąpił problem przy walidacji id klienta podczas dodawania nowej transkacji. ({e.Message})
+28.01.2023 23:31:38 - Wystąpił błąd przy próbie pobierania danych (The connection is already open.)
+29.01.2023 00:20:41 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:42 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:43 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:43 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:43 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:43 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:44 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:44 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:20:44 - Inny/sql błąd przy pobieraniu danych o stanie magazynowym produktu. (Connection must be valid and open.)
+29.01.2023 00:34:10 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1 w ilości: 4. 
+29.01.2023 00:34:12 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1 w ilości: 4. 
+29.01.2023 00:34:12 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1 w ilości: 4. 
+29.01.2023 00:36:31 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1001 w ilości: 4. 
+29.01.2023 03:02:46 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
+29.01.2023 03:21:19 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1010 w ilości: 200. 
+29.01.2023 03:27:24 - Niewystarczajace stany magazynowe na sprzedaż produktu: 1006 w ilości: 5000. 
