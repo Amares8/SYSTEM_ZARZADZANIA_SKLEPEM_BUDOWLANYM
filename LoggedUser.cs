@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Relational;
+using Org.BouncyCastle.Utilities.Collections;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -135,11 +136,26 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             //end login method
         }
 
-
+        public int Logout()
+        {
+            if (loggedLogin == "")
+            {
+                return 1;
+            }
+            else
+            {
+                loggedLogin = "";
+                accessLevel = 0;
+                firstName = "";
+                lastName = "";
+                loggedID = -1;
+                return 0;
+            }
+        }
 
         /*
             * - FUNCTION RETURN VALUES -
-            *<0 - returned total price in 
+            *<0 - returned total price
             * 0 - successfull
             * 1 - not logged in
             * 2 - wrong login/password
@@ -230,7 +246,53 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             //end registeruser method
         }
 
+        public int DeleteUser(string loginToDelete)
+        {
+            if (loginToDelete == "")
+            {
+                //invalid parameter
+                CreateLogMessage("Podano błędny lub pusty parametr lub parametry przy próbie usunięcia konta użytkownika", false);
+                return 5;
+            }
+            else if (accessLevel < 3)
+            {
+                //no permissions
+                CreateLogMessage($"Użytkownik {loggedLogin} próbował usunąć bez uprawnień konto użytkownika {loginToDelete}", false);
+                return 3;
+            }
+            else
+            {
+                try
+                {
+                    string loginToDeleteSanitized = SanitizeString(loginToDelete);
+                    string sql = $"DELETE FROM employees WHERE `employees`.`login` = '{loginToDeleteSanitized}'";
+                    databaseConnection.Open();
+                    MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                    int userDeleteResult = (int)(long)command.ExecuteNonQuery();
+                    if (userDeleteResult == 1)
+                    {
+                        //wszytsko ok
+                        databaseConnection.Close();
+                        CreateLogMessage($"Użytkownik {loggedLogin} usunął konto użytkownika {loginToDeleteSanitized}. ", false);
+                        return 0;
+                    }
+                    else
+                    {
+                        //Błąd inny
+                        databaseConnection.Close();
+                        CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDeleteSanitized}. ", false);
+                        return 4;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //other/sql error
+                    CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDelete}. ({e.Message})", false);
+                    return 4;
+                }
 
+            }
+        }
 
         public int RegisterClient(string newName, string newSurname, string newPhoneNumber, string newCity, string newEmail)
         {
@@ -278,6 +340,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             }
             //end registeruser method
         }
+
 
         public int CreateTransaction(int[] productID, int[] productAmounts, int customerID)
         {
@@ -420,107 +483,141 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
             return totalPrice * (-1);
         }
 
-        public int DeleteUser(string loginToDelete)
+        public int RegisterProduct(string newName, string newVendor, string newDescription, int newPrice)
         {
-            if (loginToDelete == "")
+            if (newName == "" || newVendor  == "" || newDescription  == "" || newPrice < 0)
             {
-                //invalid parameter
-                CreateLogMessage("Podano błędny lub pusty parametr lub parametry przy próbie usunięcia konta użytkownika", false);
+                //bad parameters
+                CreateLogMessage("Błędne lub puste parametry przy dodawaniu nowego produktu", false);
                 return 5;
             }
-            else if (accessLevel < 3)
+            else if (accessLevel < 2)
             {
                 //no permissions
-                CreateLogMessage($"Użytkownik {loggedLogin} próbował usunąć bez uprawnień konto użytkownika {loginToDelete}", false);
+                CreateLogMessage($"Brak uprawnień do dodania nowego produktu, użytkownik ({loggedLogin})", false);
                 return 3;
+
+            }
+            string newNameSanitized = SanitizeString(newName);
+            string newVendorSanitized = SanitizeString(newVendor);
+            string newDescriptionSanitized = SanitizeString(newDescription);
+            
+            string registerSQL = $"INSERT INTO `products` (`productID`, `productName`, `productVendor`, `productDescription`, `quantityInStock`, `sellingPrice`) VALUES('', '{newNameSanitized}', '{newVendorSanitized}', '{newDescriptionSanitized}', 0, {newPrice});";
+            int productRegistrationResult = int.Parse(ExecuteNonQueryCommand(registerSQL));
+            if (productRegistrationResult != 1)
+            {
+                //error
+                CreateLogMessage("Błąd przy dodawaniu produktu nowego. ", false);
+                return 4;
             }
             else
             {
-                try
-                {
-                    string loginToDeleteSanitized = SanitizeString(loginToDelete);
-                    string sql = $"DELETE FROM employees WHERE `employees`.`login` = '{loginToDeleteSanitized}'";
-                    databaseConnection.Open();
-                    MySqlCommand command = new MySqlCommand(sql, databaseConnection);
-                    int userDeleteResult = (int)(long)command.ExecuteNonQuery();
-                    if (userDeleteResult == 1)
-                    {
-                        //wszytsko ok
-                        databaseConnection.Close();
-                        CreateLogMessage($"Użytkownik {loggedLogin} usunął konto użytkownika {loginToDeleteSanitized}. ", false);
-                        return 0;
-                    }
-                    else
-                    {
-                        //Błąd inny
-                        databaseConnection.Close();
-                        CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDeleteSanitized}. ", false);
-                        return 4;
-                    }
-                }
-                catch (Exception e)
-                {
-                    //other/sql error
-                    CreateLogMessage($"Nie udało się użytkownikowi {loggedLogin} usunąć konta użytkownika {loginToDelete}. ({e.Message})", false);
-                    return 4;
-                }
-                
+                //success
+                return 0;
             }
+            
+        }
+
+        public int ModifyStockLevel(int productID, int modAmount)
+        {
+            
+            
+            if (productID < 0 || productID == null)
+            {
+                //bad parameters
+                CreateLogMessage("ProduktId nie moze byc mniejszy od zera ani pusty", false);
+                return 5;
+            }
+            else if (int.Parse(ExecuteScalarCommand($"SELECT COUNT(*) FROM products WHERE productID = {productID};")) != 1)
+            {
+                //item doesnt exist
+                CreateLogMessage("Próba dodania nieistniejacego produktu", false);
+                return 7;
+            }
+            int currentStockLevel = int.Parse(ExecuteScalarCommand($"SELECT quantityInStock FROM products WHERE productID = {productID};"));
+            if ((-1) * modAmount > currentStockLevel)
+            {
+                //nie ma tyle
+                CreateLogMessage("Próba zmniejszenia produktu na stanie o więcej niz go jest", false);
+                return 6;
+            }
+            else if (accessLevel < 1)
+            {
+                //brak uprawnien
+                CreateLogMessage($"Próba dodania/zabrania stanu magazynowego bez uprawnien, uzytkownik {loggedLogin}", false);
+                return 3;
+            }
+
+            int result = int.Parse(ExecuteNonQueryCommand($"UPDATE `products` SET `quantityInStock` = {modAmount + currentStockLevel} WHERE `products`.`productID` = {productID};"));
+            if (result != 1)
+            {
+                //error 
+                CreateLogMessage($"Błąd sql przy zmianie stanu magazuynowego. ", false);
+                return 4;
+            }
+            else
+            {
+                //ok
+                return 0;
+            }
+
         }
 
         public int ChangePassword(string oldPassword, string newPassword)
         {
-
-
-            if (loggedLogin != "")
-            {
-                try
-                {
-                    string oldPasswordHash = GetStringSha256Hash(oldPassword);
-                    string newPasswordHash = GetStringSha256Hash(newPassword);
-                    databaseConnection.Open();
-                    string sql = $"SELECT COUNT(*) FROM employees WHERE login = '{loggedLogin}' AND password = '{oldPasswordHash}';";
-                    MySqlCommand command = new MySqlCommand(sql, databaseConnection);
-                    int result = (int)(long)command.ExecuteScalar();
-                    if (result == 1)
-                    {
-                        sql = $"UPDATE employees SET password = '{newPasswordHash}' WHERE login = '{loggedLogin}'";
-                        command = new MySqlCommand(sql, databaseConnection);
-                        int passwordChangeResult = (int)(long)command.ExecuteNonQuery();
-                        if (passwordChangeResult == 1)
-                        {
-                            //success
-                            databaseConnection.Close();
-                            return 0;
-                        }
-                        else
-                        {
-                            //sql/other error
-                            CreateLogMessage($"Błąd przy zmianie hasła, użytkownik {loggedLogin}", false);
-                            databaseConnection.Close();
-                            return 4;
-                        }
-                    }
-                    else
-                    {
-                        //wrong password
-                        CreateLogMessage($"Podano błędne hasło przy zmianie hasła, użytkownik: {loggedLogin}", false);
-                        return 2;
-                    }
-                }
-                catch (Exception e)
-                {
-                    //sql/other error
-                    CreateLogMessage("Błąd przy zmianie hasła " + e.Message, false);
-                    return 4;
-                }
-            }
-            else
+            if (loggedLogin == "")
             {
                 //not logged in
                 return 1;
             }
-            //end change password method
+            else if (oldPassword == "" || newPassword == "")
+            {
+                return 5;
+            }
+            try
+            {
+                string oldPasswordHash = GetStringSha256Hash(oldPassword);
+                string newPasswordHash = GetStringSha256Hash(newPassword);
+                databaseConnection.Open();
+                string sql = $"SELECT COUNT(*) FROM employees WHERE login = '{loggedLogin}' AND password = '{oldPasswordHash}';";
+                MySqlCommand command = new MySqlCommand(sql, databaseConnection);
+                int result = (int)(long)command.ExecuteScalar();
+                databaseConnection.Close();
+                if (result == 1)
+                {
+                    databaseConnection.Open();
+                    sql = $"UPDATE employees SET password = '{newPasswordHash}' WHERE login = '{loggedLogin}'";
+                    command = new MySqlCommand(sql, databaseConnection);
+                    
+                    int passwordChangeResult = (int)(long)command.ExecuteNonQuery();
+                    databaseConnection.Close();
+                    if (passwordChangeResult == 1)
+                    {
+                        //success
+                        
+                        return 0;
+                    }
+                    else
+                    {
+                        //sql/other error
+                        CreateLogMessage($"Błąd przy zmianie hasła, użytkownik {loggedLogin}", false);
+                        return 4;
+                    }
+                }
+                else
+                {
+                    //wrong password
+                    CreateLogMessage($"Podano błędne hasło przy zmianie hasła, użytkownik: {loggedLogin}", false);
+                    return 2;
+                }
+            }
+            catch (Exception e)
+            {
+                //sql/other error
+                CreateLogMessage("Błąd przy zmianie hasła " + e.Message, false);
+                return 4;
+            }
+            
         }
 
         public int ResetUsersPassword(string loginOfReseted, string password)
@@ -534,7 +631,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     {
                         string loginOfResetedSanitized = SanitizeString(loginOfReseted);
                         string passwordHash = GetStringSha256Hash(password);
-                        string newPasswordHash = GetStringSha256Hash("password");
+                        string newPasswordHash = GetStringSha256Hash("1234");
                         try
                         {
                             databaseConnection.Open();
@@ -552,6 +649,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                                 {
                                     //success
                                     databaseConnection.Close();
+                                    CreateLogMessage($"Użytkownik {loggedLogin} zresetował hasło użytkownika {loginOfReseted}", false);
                                     return 0;
                                 }
                                 else
