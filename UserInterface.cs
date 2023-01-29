@@ -996,13 +996,13 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                 Console.Write("Hasło: ");
                 newPassword = Console.ReadLine();
 
-                Console.Write("Poziom uprawnień (0-3): ");
+                Console.Write("Poziom uprawnień (1-3): ");
                 bool isNumber;
                 do
                 {
                     isNumber = int.TryParse(Console.ReadLine(), out newAccessLevel);
                 }
-                while (!isNumber);
+                while (!isNumber || newAccessLevel < 1 || newAccessLevel > 3);
                 
 
                 
@@ -1122,7 +1122,7 @@ namespace SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM
                     break;
             }
 
-            Console.Write("\nPodaj nazwę użytkownika którego chcesz usunąć: ");
+            Console.Write("\nPodaj login użytkownika którego chcesz usunąć: ");
             string userToDelete = Console.ReadLine();
 
             Console.Write("\nCzy na pewno chcesz skasować użytkownika? Operacja jest nieodwracalna! (T/N): ");

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zsAtvMwdxNDvlTHVTInb/bznbc4KLx2CUodnN8CVChDhm2fh8Pr1MIjfj+bmIwXS/kuH6tr8SWDbp6Zq4Y7GOg==",
+  "dgSpecHash": "+u3rmLFj8HCPPbOaLdAm5sxaV263/JRIM+/mXVGYPgDYcp/e2P7m1zpKdNQrooluW6Zf0gLX86fKtMuP3R+HMw==",
   "success": true,
-  "projectFilePath": "D:\\Projekty_IT\\VisualStudio\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
+  "projectFilePath": "C:\\Users\\Amares8\\Documents\\Programy\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM\\SYSTEM_ZARZADZANIA_SKLEPEM_BUDOWLANYM.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Amares8\\.nuget\\packages\\google.protobuf\\3.19.4\\google.protobuf.3.19.4.nupkg.sha512",
     "C:\\Users\\Amares8\\.nuget\\packages\\k4os.compression.lz4\\1.2.6\\k4os.compression.lz4.1.2.6.nupkg.sha512",
