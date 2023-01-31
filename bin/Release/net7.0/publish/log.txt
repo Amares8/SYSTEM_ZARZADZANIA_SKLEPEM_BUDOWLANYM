@@ -1,0 +1,15 @@
+30.01.2023 10:19:10 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 10:19:15 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 10:19:26 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 10:19:34 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 10:22:00 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 10:23:24 - Użytkownik amares8 zresetował hasło użytkownika tomwys8
+30.01.2023 10:25:00 - Błąd rejestracji użytkownika Duplicate entry '0' for key 'PRIMARY'
+30.01.2023 10:25:12 - Wystąpił błąd przy próbie pobierania danych (The connection is already open.)
+30.01.2023 10:32:17 - Próba zmniejszenia produktu na stanie o więcej niz go jest
+30.01.2023 11:19:52 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 11:19:58 - Błędny login lub hasło przy próbie logowania 
+30.01.2023 11:20:40 - Użytkownik amares8 zresetował hasło użytkownika tomwys8
+30.01.2023 11:21:23 - Próba zmniejszenia produktu na stanie o więcej niz go jest
+30.01.2023 11:22:50 - W tablicy z numerami produktów znajdują powtórzenia. 
+30.01.2023 11:23:10 - Wystąpił błąd przy próbie pobierania danych (Index was outside the bounds of the array.)
